@@ -17,18 +17,17 @@ public class PaymentServiceImpl implements PaymentService {
   private final PaymentRepository paymentRepository;
 
   @Override
-  @Transactional
   public UUID pay(final UUID orderId, final UUID productId, final Double amountToBePaid,
       final String creditCardNumber) {
     log.info("Paying order with id {} for amount {}", orderId, amountToBePaid);
     log.info(".................................................................");
-    throw new RuntimeException("Payment failed");
-   /* log.info("Payment successful for order with id {}", orderId);
+    // throw new RuntimeException("Payment failed");
+    log.info("Payment successful for order with id {}", orderId);
     final UUID paymentId = UUID.randomUUID();
     final PaymentEntity paymentEntity = new PaymentEntity(paymentId, productId, orderId,
         amountToBePaid);
     this.paymentRepository.save(paymentEntity);
     log.info("Payment id: {}", paymentId);
-    return paymentId;*/
+    return paymentId;
   }
 }
