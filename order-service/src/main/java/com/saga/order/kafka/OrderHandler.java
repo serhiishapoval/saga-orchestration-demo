@@ -35,20 +35,23 @@ public class OrderHandler {
   @KafkaHandler
   public void handleOrderAction(@Payload final CreateOrderAction action) {
     log.info("handleOrderAction. Received CreateOrderAction: {} ", action);
-    final OrderEntity createdOrder = this.orderService.createOrder(action.getProductId(),
-        action.getQuantity());
+    final OrderEntity createdOrder =
+        this.orderService.createOrder(action.getProductId(), action.getQuantity());
     try {
-      final OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent(createdOrder.getOrderId(),
-          action.getProductId(),
-          createdOrder.getQuantity(), new Random().nextDouble());
+      final OrderCreatedEvent orderCreatedEvent =
+          new OrderCreatedEvent(
+              createdOrder.getOrderId(),
+              action.getProductId(),
+              createdOrder.getQuantity(),
+              new Random().nextDouble());
 
       this.kafkaTemplate.send(this.orderEventsTopic, orderCreatedEvent);
 
       log.info("handleOrderAction. Sent OrderCreatedEvent: {} ", orderCreatedEvent);
     } catch (Exception e) {
 
-      OrderCreationFailedEvent orderCreationFailedEvent = new OrderCreationFailedEvent(
-          createdOrder.getOrderId(), e.getMessage());
+      OrderCreationFailedEvent orderCreationFailedEvent =
+          new OrderCreationFailedEvent(createdOrder.getOrderId(), e.getMessage());
       this.kafkaTemplate.send(this.orderEventsTopic, orderCreationFailedEvent);
 
       log.info("handleOrderAction. Sent OrderCreationFailedEvent: {} ", orderCreationFailedEvent);
@@ -61,10 +64,10 @@ public class OrderHandler {
     try {
       this.orderService.cancelOrder(action.getOrderId());
     } catch (Exception e) {
-      //HERE WE SHOULD THROW A RETRYABLE EXCEPTION
+      // HERE WE SHOULD THROW A RETRYABLE EXCEPTION
     }
-    final OrderCancellationDoneEvent orderCancellationDoneEvent = new OrderCancellationDoneEvent(
-        action.getOrderId(), action.getProductId());
+    final OrderCancellationDoneEvent orderCancellationDoneEvent =
+        new OrderCancellationDoneEvent(action.getOrderId(), action.getProductId());
 
     this.kafkaTemplate.send(this.orderEventsTopic, orderCancellationDoneEvent);
 
@@ -78,14 +81,15 @@ public class OrderHandler {
     try {
       this.orderService.payOrder(action.getOrderId());
     } catch (Exception e) {
-      //HERE WE SHOULD THROW A RETRYABLE EXCEPTION
+      // HERE WE SHOULD THROW A RETRYABLE EXCEPTION
     }
 
-    final OrderStatusToPaidUpdatedEvent orderStatusToPaidUpdatedEvent = new OrderStatusToPaidUpdatedEvent(
-        action.getOrderId());
+    final OrderStatusToPaidUpdatedEvent orderStatusToPaidUpdatedEvent =
+        new OrderStatusToPaidUpdatedEvent(action.getOrderId());
 
     this.kafkaTemplate.send(this.orderEventsTopic, orderStatusToPaidUpdatedEvent);
-    log.info("handleOrderAction. Sent OrderStatusToPaidUpdatedEvent: {} ",
+    log.info(
+        "handleOrderAction. Sent OrderStatusToPaidUpdatedEvent: {} ",
         orderStatusToPaidUpdatedEvent);
   }
 }

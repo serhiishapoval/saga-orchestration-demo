@@ -11,9 +11,9 @@ import org.springframework.kafka.core.ProducerFactory;
 @Configuration
 public class KafkaConfiguration {
 
-  private final static Integer REPLICAS = 3;
+  private static final Integer REPLICAS = 3;
 
-  private final static Integer PARTITIONS = 3;
+  private static final Integer PARTITIONS = 3;
 
   @Value("${kafka.topic.name.product.actions}")
   private String productActionsTopic;

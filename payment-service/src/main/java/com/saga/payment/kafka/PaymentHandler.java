@@ -30,23 +30,28 @@ public class PaymentHandler {
   public void handlePaymentAction(@Payload final ProcessPaymentAction action) {
     log.info("handlePaymentAction. Received ProcessPaymentAction: {} ", action);
     try {
-      final UUID paymentId = this.paymentService.pay(action.getOrderId(), action.getProductId(),
-          action.getAmountToBePaid(), action.getCreditCardNumber());
-      PaymentProcessedEvent paymentProcessedEvent = new PaymentProcessedEvent(paymentId,
-          action.getOrderId(), action.getProductId());
+      final UUID paymentId =
+          this.paymentService.pay(
+              action.getOrderId(),
+              action.getProductId(),
+              action.getAmountToBePaid(),
+              action.getCreditCardNumber());
+      PaymentProcessedEvent paymentProcessedEvent =
+          new PaymentProcessedEvent(paymentId, action.getOrderId(), action.getProductId());
 
       this.kafkaTemplate.send(this.paymentEventsTopic, paymentProcessedEvent);
 
       log.info("handlePaymentAction. Sent PaymentProcessedEvent: {} ", paymentProcessedEvent);
     } catch (Exception e) {
-      final PaymentProcessingFailedEvent paymentProcessingFailedEvent = new PaymentProcessingFailedEvent(
-          action.getOrderId(), action.getProductId(), e.getMessage());
+      final PaymentProcessingFailedEvent paymentProcessingFailedEvent =
+          new PaymentProcessingFailedEvent(
+              action.getOrderId(), action.getProductId(), e.getMessage());
 
       this.kafkaTemplate.send(this.paymentEventsTopic, paymentProcessingFailedEvent);
 
-      log.info("handlePaymentAction. Sent PaymentProcessingFailedEvent: {} ",
+      log.info(
+          "handlePaymentAction. Sent PaymentProcessingFailedEvent: {} ",
           paymentProcessingFailedEvent);
     }
-
   }
 }

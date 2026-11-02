@@ -26,8 +26,8 @@ public class StoreController {
   @PostMapping("/buy")
   public ResponseEntity<Void> buySomething(@RequestBody final BuySomethingRequest request) {
     log.info("buySomething. Received request to buy a product by ID: {}", request);
-    final ProductReserveAction productReserveAction = new ProductReserveAction(
-        request.getProductId());
+    final ProductReserveAction productReserveAction =
+        new ProductReserveAction(request.getProductId());
 
     this.kafkaTemplate.send(this.productActionsTopic, productReserveAction);
     log.info("buySomething. Sent ProductReserveAction: {}", productReserveAction);

@@ -6,7 +6,6 @@ import com.saga.order.entity.OrderStatus;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,8 +16,8 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public OrderEntity createOrder(final UUID productId, final Integer quantity) {
-    final OrderEntity orderEntity = new OrderEntity(UUID.randomUUID(), productId, quantity,
-        OrderStatus.NEW.getStatus());
+    final OrderEntity orderEntity =
+        new OrderEntity(UUID.randomUUID(), productId, quantity, OrderStatus.NEW.getStatus());
 
     return this.orderRepository.save(orderEntity);
   }

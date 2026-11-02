@@ -8,7 +8,6 @@ import com.saga.dto.product.ProductRollbackDoneEvent;
 import com.saga.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -37,8 +36,8 @@ public class ProductHandler {
     try {
 
       this.productService.buyProduct(action.getProductId());
-      final ProductReservedEvent event = new ProductReservedEvent(action.getProductId(),
-          RESERVED_QUANTITY);
+      final ProductReservedEvent event =
+          new ProductReservedEvent(action.getProductId(), RESERVED_QUANTITY);
 
       this.kafkaTemplate.send(this.productEventsTopic, event);
 
@@ -47,16 +46,13 @@ public class ProductHandler {
     } catch (Exception e) {
 
       log.error("handleProductEvent. Error while buying product: {}", e.getMessage());
-      final ProductReservationFailedEvent event = new ProductReservationFailedEvent(
-          action.getProductId(), e.getMessage());
+      final ProductReservationFailedEvent event =
+          new ProductReservationFailedEvent(action.getProductId(), e.getMessage());
 
       this.kafkaTemplate.send(this.productEventsTopic, event);
 
       log.info("handleProductEvent. Sent ProductReservationFailedEvent: {} ", event);
-
     }
-
-
   }
 
   @KafkaHandler
@@ -65,7 +61,7 @@ public class ProductHandler {
     try {
       this.productService.rollbackProduct(action.getProductId());
     } catch (Exception e) {
-      //HERE WE SHOULD THROW A RETRYABLE EXCEPTION
+      // HERE WE SHOULD THROW A RETRYABLE EXCEPTION
     }
 
     final ProductRollbackDoneEvent event = new ProductRollbackDoneEvent(action.getProductId());
@@ -74,5 +70,4 @@ public class ProductHandler {
 
     log.info("handleProductEvent. Sent ProductRollbackDoneEvent: {} ", event);
   }
-
 }
