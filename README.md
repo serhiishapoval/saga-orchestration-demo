@@ -22,6 +22,7 @@ The project is a learning and demo codebase. It is not production-ready. See [Kn
 - [Data model and seed data](#data-model-and-seed-data)
 - [Configuration reference](#configuration-reference)
 - [Running locally](#running-locally)
+- [Running the tests](#running-the-tests)
 - [Trying it out](#trying-it-out)
 - [Build notes](#build-notes)
 - [Known limitations](#known-limitations)
@@ -123,6 +124,7 @@ Each business service has the same layering: `kafka` (listener) â†’ `service` â†
 - Spring Web, Spring Data JPA, Spring for Apache Kafka
 - H2 in-memory database
 - Lombok 1.18.48
+- JUnit 6.1.3 and Mockito 5.24.0 for unit tests (pinned in the parent POM)
 - Maven (multi-module)
 - google-java-format for code style
 
@@ -361,6 +363,19 @@ Before the orchestrator starts, Kafka must be reachable, or the producer fails a
 
 ---
 
+## Running the tests
+
+```bash
+mvn test                                    # all modules
+mvn -pl store-orchestrator-service -am test # one module, with its dependencies
+```
+
+Each service has unit tests in `src/test/java`. They mock `KafkaTemplate` and the repositories, so no Kafka cluster, database or running service is needed.
+
+The tests cover the orchestrator's event-to-action mapping in `KafkaEventHandler`, its controller, and the handlers and services of the order, payment and product services.
+
+---
+
 ## Trying it out
 
 1. Open the H2 consoles (optional):
@@ -392,7 +407,8 @@ Payment cannot fail in the current code, so the compensation path only runs if y
 - `java.version` is 27, but the compiler targets `maven.compiler.release` **25**. Spring Boot 3.4.4's repackage plugin cannot read Java 27 class files (major version 71) and fails with `Unsupported class file major version 71`.
 - Lombok is 1.18.48. Version 1.18.36 failed on JDK 26/27 with a `TypeTag :: UNKNOWN` error during compilation.
 - Code is formatted with **google-java-format** (v2.0.0 at the time of writing). The `dto` module is a plain library and builds with the rest of the reactor.
-- There are no unit or integration tests in the repository.
+- Unit tests use JUnit 6 and Mockito 5, pinned in the parent POM. `byte-buddy.version` is pinned to 1.18.17 for Java 27 support.
+- There are no integration tests.
 
 ---
 
@@ -430,4 +446,4 @@ This is a demo. The following are known gaps, several of them marked with `HERE 
 
 - `spring.application.name` is `PaymentService` in payment-service, while the other services use lowercase hyphenated names.
 - `util.CreditCardUtils` lives in the package `util`, outside the `com.saga` package hierarchy.
-- No tests, no CI and no containerisation are included.
+- No integration tests, no CI and no containerisation are included.
